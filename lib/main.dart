@@ -4,6 +4,7 @@
 
 
 import 'package:english_words/english_words.dart';
+import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
 
@@ -17,11 +18,58 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primaryColor: Colors.white,
       ),
-      home: AnimatedContainerDemo(),
+      home: LogoApp(),
     );
   }
 }
 
+// flutter logo
+class LogoApp extends StatefulWidget {
+  const LogoApp({Key? key}) : super(key: key);
+
+  @override
+  _LogoAppState createState() => _LogoAppState();
+}
+
+class _LogoAppState extends State<LogoApp> with SingleTickerProviderStateMixin {
+  late Animation<double> animation;
+  late AnimationController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller =
+        AnimationController(vsync: this, duration: const Duration(seconds: 2));
+    animation = Tween<double>(begin: 0, end: 300).animate(controller)
+    ..addListener(() {
+      setState(() {
+        // The state that has changed here is the animation object’s value.
+      });
+    });
+    controller.repeat(reverse: true);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 10),
+        height: animation.value,
+        width: animation.value,
+        child: const FlutterLogo(),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+}
+
+// random words
 class RandomWords extends StatefulWidget {
   const RandomWords({Key? key}) : super(key: key);
 

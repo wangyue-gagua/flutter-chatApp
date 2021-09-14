@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-
 import 'package:english_words/english_words.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
@@ -22,9 +21,48 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+// animateBuilder
+class LogoWidget extends StatelessWidget {
+  const LogoWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      child: const FlutterLogo(),
+    );
+  }
+}
+
+class GrowTransition extends StatelessWidget {
+  const GrowTransition({required this.child, required this.animation, Key? key})
+      : super(key: key);
+
+  final Widget child;
+  final Animation<double> animation;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: AnimatedBuilder(
+        animation: animation,
+        builder: (context, child) {
+          return SizedBox(
+            height: animation.value,
+            width: animation.value,
+            child: child,
+          );
+        },
+        child: child,
+      ),
+    );
+  }
+}
+
 // animateWidget
 class AnimatedLogo extends AnimatedWidget {
-  const AnimatedLogo({Key? key, required Animation<double> animation })
+  const AnimatedLogo({Key? key, required Animation<double> animation})
       : super(key: key, listenable: animation);
 
   @override
@@ -40,7 +78,6 @@ class AnimatedLogo extends AnimatedWidget {
     );
   }
 }
-
 
 // flutter logo
 class LogoApp extends StatefulWidget {
@@ -59,21 +96,14 @@ class _LogoAppState extends State<LogoApp> with SingleTickerProviderStateMixin {
     super.initState();
     controller =
         AnimationController(vsync: this, duration: const Duration(seconds: 2));
-    animation = Tween<double>(begin: 0, end: 300).animate(controller)
-      ..addStatusListener((status) {
-        if (status == AnimationStatus.completed) {
-          controller.reverse();
-        } else if (status == AnimationStatus.dismissed) {
-          controller.forward();
-        }
-      });
-      // ..addStatusListener((status) {print('$status');});
+    animation = Tween<double>(begin: 0, end: 300).animate(controller);
+    // ..addStatusListener((status) {print('$status');});
     controller.forward();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedLogo(animation: animation);
+    return GrowTransition(child: const LogoWidget(), animation: animation);
   }
 
   @override
@@ -81,7 +111,6 @@ class _LogoAppState extends State<LogoApp> with SingleTickerProviderStateMixin {
     controller.dispose();
     super.dispose();
   }
-
 }
 
 // random words
@@ -98,31 +127,30 @@ class _RandomWordsState extends State<RandomWords> {
   final _biggerFont = const TextStyle(fontSize: 18.0);
 
   void _pushSaved() {
-    Navigator.of(context).push(
-        MaterialPageRoute(builder: (BuildContext context) {
-          final tiles = _saved.map(
-                  (WordPair pair) {
-                return ListTile(
-                  title: Text(
-                    pair.asPascalCase,
-                    style: _biggerFont,
-                  ),
-                );
-              }
-          );
-          final divided = ListTile.divideTiles(
-            context: context,
-            tiles: tiles,
-          ).toList();
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (BuildContext context) {
+      final tiles = _saved.map((WordPair pair) {
+        return ListTile(
+          title: Text(
+            pair.asPascalCase,
+            style: _biggerFont,
+          ),
+        );
+      });
+      final divided = ListTile.divideTiles(
+        context: context,
+        tiles: tiles,
+      ).toList();
 
-          return Scaffold(
-            appBar: AppBar(
-              title: Text('Saved Suggestions'),
-            ),
-            body: ListView(children: divided,),
-          );
-        })
-    );
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Saved Suggestions'),
+        ),
+        body: ListView(
+          children: divided,
+        ),
+      );
+    }));
   }
 
   @override
@@ -168,8 +196,7 @@ class _RandomWordsState extends State<RandomWords> {
         setState(() {
           if (alreadySaved) {
             _saved.remove(pair);
-          }
-          else {
+          } else {
             _saved.add(pair);
           }
         });
@@ -180,7 +207,8 @@ class _RandomWordsState extends State<RandomWords> {
 
 // Fade-in
 
-const owl_url = 'https://raw.githubusercontent.com/flutter/website/master/src/images/owl.jpg';
+const owl_url =
+    'https://raw.githubusercontent.com/flutter/website/master/src/images/owl.jpg';
 
 class FadeInDemo extends StatefulWidget {
   _FadeInDemoState createState() => _FadeInDemoState();
@@ -198,10 +226,9 @@ class _FadeInDemoState extends State<FadeInDemo> {
           'Show details',
           style: TextStyle(color: Colors.blueAccent),
         ),
-        onPressed: () =>
-            setState(() {
-              opacity = 1;
-            }),
+        onPressed: () => setState(() {
+          opacity = 1;
+        }),
       ),
       AnimatedOpacity(
         duration: Duration(seconds: 2),
@@ -217,6 +244,7 @@ class _FadeInDemoState extends State<FadeInDemo> {
     ]);
   }
 }
+
 // shape-shifting effect
 double randomBorderRadius() {
   return Random().nextDouble() * 64;
@@ -284,6 +312,3 @@ class _AnimatedContainerDemoState extends State<AnimatedContainerDemo> {
     );
   }
 }
-
-
-

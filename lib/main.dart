@@ -22,6 +22,25 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+// animateWidget
+class AnimatedLogo extends AnimatedWidget {
+  const AnimatedLogo({Key? key, required Animation<double> animation })
+      : super(key: key, listenable: animation);
+
+  @override
+  Widget build(BuildContext context) {
+    final animation = listenable as Animation<double>;
+    return Center(
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 10),
+        height: animation.value,
+        width: animation.value,
+        child: const FlutterLogo(),
+      ),
+    );
+  }
+}
+
 
 // flutter logo
 class LogoApp extends StatefulWidget {
@@ -40,25 +59,13 @@ class _LogoAppState extends State<LogoApp> with SingleTickerProviderStateMixin {
     super.initState();
     controller =
         AnimationController(vsync: this, duration: const Duration(seconds: 2));
-    animation = Tween<double>(begin: 0, end: 300).animate(controller)
-    ..addListener(() {
-      setState(() {
-        // The state that has changed here is the animation object’s value.
-      });
-    });
+    animation = Tween<double>(begin: 0, end: 300).animate(controller);
     controller.repeat(reverse: true);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 10),
-        height: animation.value,
-        width: animation.value,
-        child: const FlutterLogo(),
-      ),
-    );
+    return AnimatedLogo(animation: animation);
   }
 
   @override
@@ -183,9 +190,10 @@ class _FadeInDemoState extends State<FadeInDemo> {
           'Show details',
           style: TextStyle(color: Colors.blueAccent),
         ),
-        onPressed: () => setState(() {
-          opacity = 1;
-        }),
+        onPressed: () =>
+            setState(() {
+              opacity = 1;
+            }),
       ),
       AnimatedOpacity(
         duration: Duration(seconds: 2),
@@ -230,6 +238,7 @@ class _AnimatedContainerDemoState extends State<AnimatedContainerDemo> {
     borderRadius = randomBorderRadius();
     margin = randomMargin();
   }
+
   void change() {
     setState(() {
       color = randomColor();

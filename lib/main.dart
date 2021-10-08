@@ -2,10 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+
+
 import 'package:english_words/english_words.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
+
+import 'package:flutter/scheduler.dart';
 
 void main() => runApp(MyApp());
 
@@ -17,11 +21,78 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primaryColor: Colors.white,
       ),
-      home: LogoApp(),
+      home: HeroAnimation(),
     );
   }
 }
 
+// PhotoHero
+class PhotoHero extends StatelessWidget {
+  const PhotoHero({ Key? key, required this.photo, required this.onTap, required this.width }): super(key: key);
+
+  final String photo;
+  final VoidCallback onTap;
+  final double width;
+
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: width,
+      child: Hero(
+        tag: photo,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
+            child: Image.asset(
+              photo,
+              fit: BoxFit.contain,
+            ),
+          ),
+        ),
+      )
+    );
+  }
+}
+
+// HeroAnimation class
+class HeroAnimation extends StatelessWidget {
+  Widget build(BuildContext context) {
+    timeDilation = 5.0;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Basic Hero Animation'),
+      ),
+      body: Center(
+        child: PhotoHero(
+          photo: 'flippers-alpha.png',
+          width: 300.0,
+          onTap: () {
+            Navigator.of(context).push(MaterialPageRoute<void>(builder: (BuildContext context) {
+              return Scaffold(
+                appBar: AppBar(
+                  title: const Text('Flippers Page'),
+                ),
+                body: Container(
+                  color: Colors.lightBlueAccent,
+                  padding: const EdgeInsets.all(16.0),
+                  alignment: Alignment.topLeft,
+                  child: PhotoHero(
+                    photo: 'flippers-alpha.png',
+                    width: 100.0,
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ),
+              );
+            }));
+          },
+        ),
+      ),
+    );
+  }
+}
 // animateBuilder
 class LogoWidget extends StatelessWidget {
   const LogoWidget({Key? key}) : super(key: key);

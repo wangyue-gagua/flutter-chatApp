@@ -45,6 +45,8 @@ class WelcomeScreen extends StatelessWidget {
 }
 
 class SignUpForm extends StatefulWidget {
+  const SignUpForm({Key? key}):super(key: key);
+
   @override
   _SignUpFormState createState() => _SignUpFormState();
 }
@@ -55,6 +57,7 @@ class _SignUpFormState extends State<SignUpForm> {
   final _userNameTextController = TextEditingController();
 
   double _formProgress = 0;
+  final _formKey = GlobalKey<FormState>();
 
   void _showWelcomeScreen() {
     Navigator.of(context).pushNamed("/welcome");
@@ -82,6 +85,7 @@ class _SignUpFormState extends State<SignUpForm> {
   @override
   Widget build(BuildContext context) {
     return Form(
+      key: _formKey,
         onChanged: _updateFormProgress,
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -96,6 +100,12 @@ class _SignUpFormState extends State<SignUpForm> {
               child: TextFormField(
                 controller: _firstNameTextController,
                 decoration: InputDecoration(hintText: 'First name'),
+                validator: (value) {
+                  if (value != 'hh') {
+                    return 'Please enter hh';
+                  }
+                  return null;
+                },
               ),
             ),
             Padding(
@@ -113,7 +123,7 @@ class _SignUpFormState extends State<SignUpForm> {
               ),
             ),
             TextButton(
-                onPressed: _formProgress == 1 ? _showWelcomeScreen : null,
+                onPressed:  _formProgress == 1 ? _formKey.currentState!.validate()?  _showWelcomeScreen : null : null,
                 child: Text('Sign up'),
                 style: ButtonStyle(
                   foregroundColor: MaterialStateProperty.resolveWith((states) =>

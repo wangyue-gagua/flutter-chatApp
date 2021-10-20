@@ -23,14 +23,17 @@ class FriendlyChatApp extends StatelessWidget {
 }
 
 class ChatMessage extends StatelessWidget {
-  const ChatMessage({Key? key, required this.text, required this.animationController}) : super(key: key);
+  const ChatMessage(
+      {Key? key, required this.text, required this.animationController})
+      : super(key: key);
   final String text;
   final AnimationController animationController;
 
   @override
   Widget build(BuildContext context) {
     return SizeTransition(
-      sizeFactor: CurvedAnimation(parent: animationController, curve: Curves.elasticOut),
+      sizeFactor: CurvedAnimation(
+          parent: animationController, curve: Curves.elasticOut),
       axisAlignment: 2.0,
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 10.0),
@@ -43,18 +46,20 @@ class ChatMessage extends StatelessWidget {
                 child: Text(_name[0]),
               ),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _name,
-                  style: Theme.of(context).textTheme.headline4,
-                ),
-                Container(
-                  margin: EdgeInsets.only(top: 5.0),
-                  child: Text(text),
-                )
-              ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _name,
+                    style: Theme.of(context).textTheme.headline4,
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: 5.0),
+                    child: Text(text),
+                  )
+                ],
+              ),
             )
           ],
         ),
@@ -70,22 +75,24 @@ class ChatScreen extends StatefulWidget {
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
-
-
 }
 
 class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   final _textController = TextEditingController();
   final List<ChatMessage> _messages = [];
   final FocusNode _focusNode = FocusNode();
+  bool _isComposing = false;
 
   void _handleSubmitted(String text) {
     _textController.clear();
-    ChatMessage message = ChatMessage(text: text,
-    animationController: AnimationController(
-      duration: const Duration(milliseconds: 700),
-      vsync: this
-    ),);
+    setState(() {
+      _isComposing = false;
+    });
+    ChatMessage message = ChatMessage(
+      text: text,
+      animationController: AnimationController(
+          duration: const Duration(milliseconds: 700), vsync: this),
+    );
     setState(() {
       _messages.insert(0, message);
     });
@@ -95,7 +102,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    for(var message in _messages) {
+    for (var message in _messages) {
       message.animationController.dispose();
     }
     super.dispose();
@@ -107,8 +114,13 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       child: Row(children: [
         Flexible(
           child: TextField(
+            onChanged: (String text) {
+              setState(() {
+                _isComposing = text.isNotEmpty;
+              });
+            },
             controller: _textController,
-            onSubmitted: _handleSubmitted,
+            onSubmitted: _isComposing ? _handleSubmitted : null,
             decoration: InputDecoration.collapsed(hintText: 'Send a message'),
             focusNode: _focusNode,
           ),
@@ -119,7 +131,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             margin: EdgeInsets.symmetric(horizontal: 4.0),
             child: IconButton(
               icon: const Icon(Icons.send),
-              onPressed: () => _handleSubmitted(_textController.text),
+              onPressed: _isComposing
+                  ? () => _handleSubmitted(_textController.text)
+                  : null,
             ),
           ),
         )

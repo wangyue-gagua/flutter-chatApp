@@ -21,37 +21,47 @@ class FriendlyChatApp extends StatelessWidget {
     );
   }
 }
+
 class ChatMessage extends StatelessWidget {
-  const ChatMessage({Key? key, required this.text}) : super(key: key);
+  const ChatMessage({Key? key, required this.text, required this.animationController}) : super(key: key);
   final String text;
+  final AnimationController animationController;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 10.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            margin: const EdgeInsets.only(right: 16.0),
-            child: CircleAvatar(child: Text(_name[0]),),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(_name, style: Theme.of(context).textTheme.headline4,),
-              Container(
-                margin: EdgeInsets.only(top: 5.0),
-                child: Text(text),
-              )
-            ],
-          )
-        ],
+    return SizeTransition(
+      sizeFactor: CurvedAnimation(parent: animationController, curve: Curves.elasticOut),
+      axisAlignment: 2.0,
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 10.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              margin: const EdgeInsets.only(right: 16.0),
+              child: CircleAvatar(
+                child: Text(_name[0]),
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _name,
+                  style: Theme.of(context).textTheme.headline4,
+                ),
+                Container(
+                  margin: EdgeInsets.only(top: 5.0),
+                  child: Text(text),
+                )
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
 }
-
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({
@@ -60,20 +70,35 @@ class ChatScreen extends StatefulWidget {
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
+
+
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   final _textController = TextEditingController();
   final List<ChatMessage> _messages = [];
   final FocusNode _focusNode = FocusNode();
 
   void _handleSubmitted(String text) {
     _textController.clear();
-    ChatMessage message = ChatMessage(text: text);
+    ChatMessage message = ChatMessage(text: text,
+    animationController: AnimationController(
+      duration: const Duration(milliseconds: 700),
+      vsync: this
+    ),);
     setState(() {
       _messages.insert(0, message);
     });
     _focusNode.requestFocus();
+    message.animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    for(var message in _messages) {
+      message.animationController.dispose();
+    }
+    super.dispose();
   }
 
   Widget _buildTextComposer() {
@@ -110,15 +135,19 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
       body: Column(
         children: [
-          Flexible(child: ListView.builder(itemBuilder: (_, int index)=> _messages[index],
-          itemCount: _messages.length,
-          padding: EdgeInsets.all(8.0),
-          reverse: true,),),
-          Divider(height: 1.0,),
-          Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).cardColor
+          Flexible(
+            child: ListView.builder(
+              itemBuilder: (_, int index) => _messages[index],
+              itemCount: _messages.length,
+              padding: EdgeInsets.all(8.0),
+              reverse: true,
             ),
+          ),
+          Divider(
+            height: 1.0,
+          ),
+          Container(
+            decoration: BoxDecoration(color: Theme.of(context).cardColor),
             child: _buildTextComposer(),
           )
         ],

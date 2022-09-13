@@ -2,16 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-
-
-
 import 'package:flutter/material.dart';
 
-
-import 'RadialExpansionDemo.dart';
 import 'chatApp.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(FriendlyChatApp());
 
 class MyApp extends StatelessWidget {
   @override

@@ -11,7 +11,7 @@ Now, the UI of this chat app have almost finished.
 ## Backend
 ~~Trying to implement message sending between users.~~
 
-Read time messages transfer via Firebase cloud.
+Real time messages transfer via Firebase cloud.
 
 ## Application snapshot
 ### Login
